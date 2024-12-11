@@ -2,15 +2,28 @@ from PIL import Image
 import cv2
 import os
 import numpy as np
+import math
 
 CUR_DIR = os.path.realpath(__file__).replace("\\","/")
 FILENAME = CUR_DIR.split("/")[-1]
 CUR_DIR = CUR_DIR.replace(FILENAME, "")
 
-IMAGES_DIR = CUR_DIR + '/images'
+# define input folder and make sure it exists
+IMAGES_DIR = os.path.join(CUR_DIR, 'images')
+if not os.path.exists(IMAGES_DIR):
+    os.mkdir(IMAGES_DIR)
+
+# define output folder and make sure it exists
+IMAGES_DIR_OUT = os.path.join(CUR_DIR, "images_out")
+if not os.path.exists(IMAGES_DIR_OUT):
+    os.mkdir(IMAGES_DIR_OUT)
+
+# read filenames of images in the IMAGES_DIR path
 images = os.listdir(IMAGES_DIR)
 
-RATIO_DEF = 1.4142
+# define final output ratio for images
+RATIO_OUT = math.sqrt(2)
+
 for image in images:
     print(image)
 
@@ -23,17 +36,15 @@ for image in images:
     height = float(img_cv.shape[0])
     ratio = width/height
 
-    if ratio >= RATIO_DEF:  # longer than needed => increase height
-        height = int(width / RATIO_DEF)
+    if ratio >= RATIO_OUT:  # longer than needed => increase height
+        height = int(width / RATIO_OUT)
     else:                    # higher than needed => increase width
-        width = int(height * RATIO_DEF)
+        width = int(height * RATIO_OUT)
 
     width = int(width)
     height = int(height)
 
     print("\n")
     resized = cv2.resize(img_cv,(width,height),interpolation = cv2.INTER_LANCZOS4)
-    # resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
-    IMAGES_DIR_OUT = os.path.join(CUR_DIR, "images_out")
     cv2.imwrite(os.path.join(IMAGES_DIR_OUT,image), resized)
 
